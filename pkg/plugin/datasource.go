@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"time"
+
+	"github.com/apache/arrow/go/v10/arrow"
+	"github.com/apache/arrow/go/v10/arrow/array"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+
+	"github.com/spiceai/gospice"
 )
 
 // Make sure Datasource implements required interfaces. This is important to do
@@ -24,19 +28,37 @@ var (
 )
 
 // NewDatasource creates a new datasource instance.
-func NewDatasource(_ backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	return &Datasource{}, nil
+func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	spice := gospice.NewSpiceClient()
+
+	apiKey := settings.DecryptedSecureJSONData["apiKey"]
+
+	if apiKey == "" {
+		panic("missing Spice.xyz apiKey")
+	}
+
+	if err := spice.Init(apiKey); err != nil {
+		panic(fmt.Errorf("error initializing SpiceClient: %w", err))
+	}
+
+	return &Datasource{
+		spice:    *spice,
+		settings: settings,
+	}, nil
 }
 
 // Datasource is an example datasource which can respond to data queries, reports
 // its health and has streaming skills.
-type Datasource struct{}
+type Datasource struct {
+	spice    gospice.SpiceClient
+	settings backend.DataSourceInstanceSettings
+}
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
 // created. As soon as datasource settings change detected by SDK old datasource instance will
 // be disposed and a new one will be created using NewSampleDatasource factory function.
 func (d *Datasource) Dispose() {
-	// Clean up datasource instance resources.
+	d.spice.Close()
 }
 
 // QueryData handles multiple queries and returns multiple responses.
@@ -59,33 +81,73 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
-type queryModel struct{}
-
-func (d *Datasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
+func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	var response backend.DataResponse
 
-	// Unmarshal the JSON into our queryModel.
-	var qm queryModel
+	if len(query.JSON) == 0 {
+		return backend.ErrDataResponse(backend.StatusBadRequest, "empty query")
+	}
 
-	err := json.Unmarshal(query.JSON, &qm)
+	q := &spiceQuery{}
+	err := json.Unmarshal(query.JSON, &q)
 	if err != nil {
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	// create data frame response.
-	// For an overview on data frames and how grafana handles them:
-	// https://grafana.com/docs/grafana/latest/developers/plugins/data-frames/
+	reader, err := d.spice.Query(ctx, q.QueryText)
+	if err != nil {
+		panic(fmt.Errorf("error querying: %w", err))
+	}
+
+	schema := reader.Schema()
+
 	frame := data.NewFrame("response")
 
-	// add fields.
-	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
-		data.NewField("values", nil, []int64{10, 20}),
-	)
+	for reader.Next() {
+		record := reader.Record()
+		defer record.Release()
 
-	// add the frames to the response.
+		for i, field := range schema.Fields() {
+			column := record.Column(i)
+			defer column.Release()
+
+			columnSchema := schema.Field(i)
+			columnType := columnSchema.Type.ID()
+
+			// TODO: rewrite this logic in more elegant way
+			// TODO: cower all possible types
+			switch columnType {
+			case arrow.STRING:
+				arr := make([]string, column.Len())
+				for i := 0; i < column.Len(); i++ {
+					arr[i] = column.(*array.String).Value(i)
+				}
+				frame.Fields = append(frame.Fields,
+					data.NewField(field.Name, nil, arr))
+
+			case arrow.INT64:
+				arr := make([]int64, column.Len())
+				for i := 0; i < column.Len(); i++ {
+					arr[i] = column.(*array.Int64).Value(i)
+				}
+				frame.Fields = append(frame.Fields,
+					data.NewField(field.Name, nil, arr))
+
+			// NOTE: grafana doesn't support decimal128, so we have to convert to float
+			case arrow.DECIMAL128:
+				arr := make([]float64, column.Len())
+				for i := 0; i < column.Len(); i++ {
+					arr[i] = column.(*array.Decimal128).Value(i).ToFloat64(1)
+				}
+				frame.Fields = append(frame.Fields,
+					data.NewField(field.Name, nil, arr))
+			}
+		}
+	}
+
 	response.Frames = append(response.Frames, frame)
 
+	reader.Release()
 	return response
 }
 
@@ -93,6 +155,7 @@ func (d *Datasource) query(_ context.Context, pCtx backend.PluginContext, query 
 // The main use case for these health checks is the test button on the
 // datasource configuration page which allows users to verify that
 // a datasource is working as expected.
+// TODO: setup health check for SpiceAI
 func (d *Datasource) CheckHealth(_ context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
