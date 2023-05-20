@@ -2,11 +2,10 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
   queryText?: string;
-  constant: number;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
-  constant: 6.5,
+  queryText: 'SELECT * FROM eth.recent_blocks ORDER BY number LIMIT 10',
 };
 
 /**
