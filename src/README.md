@@ -1,5 +1,5 @@
 <!-- This README file is going to be the one displayed on the Grafana.com website for your plugin -->
 
-# Spice Xyz
+# Spice.xyz
 
-Spice xyz datasource plugin for grafana
+Spice.xyz datasource plugin for grafana

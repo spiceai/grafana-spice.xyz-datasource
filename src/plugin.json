@@ -1,13 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
-  "name": "Spice Xyz",
+  "name": "Spice.xyz",
   "id": "spiceai-spicexyz-datasource",
   "metrics": true,
   "backend": true,
   "executable": "gpx_spice_xyz",
   "info": {
-    "description": "Spice xyz datasource plugin for grafana",
+    "description": "Spice.xyz datasource plugin for grafana",
     "author": {
       "name": "Spice ai"
     },

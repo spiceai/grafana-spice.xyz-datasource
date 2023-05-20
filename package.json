@@ -1,7 +1,7 @@
 {
   "name": "spice-xyz",
   "version": "1.0.0",
-  "description": "Spice xyz datasource plugin for grafana",
+  "description": "Spice.xyz datasource plugin for grafana",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
