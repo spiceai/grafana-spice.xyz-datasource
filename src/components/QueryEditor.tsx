@@ -1,5 +1,5 @@
-import React, { ChangeEvent } from 'react';
-import { InlineField, Input } from '@grafana/ui';
+import React from 'react';
+import { CodeEditor } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery } from '../types';
@@ -7,18 +7,23 @@ import { MyDataSourceOptions, MyQuery } from '../types';
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
 export function QueryEditor({ query, onChange, onRunQuery }: Props) {
-  const onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, queryText: event.target.value });
-    // onRunQuery();
+  const onQueryTextChange = (value: string) => {
+    onChange({ ...query, queryText: value });
   };
 
   const { queryText } = query;
 
   return (
-    <div className="gf-form">
-      <InlineField label="Query Text" labelWidth={16} tooltip="Not used yet">
-        <Input onChange={onQueryTextChange} value={queryText || ''} />
-      </InlineField>
-    </div>
+    <CodeEditor
+      width={600}
+      height={200}
+      language="sql"
+      showMiniMap={false}
+      onEditorDidMount={() => {}} // hack - onChange won't work without this
+      onSave={onQueryTextChange}
+      onChange={onQueryTextChange}
+      onBlur={onRunQuery}
+      value={queryText || ''}
+    />
   );
 }
