@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/apache/arrow/go/v10/arrow"
 	"github.com/apache/arrow/go/v10/arrow/array"
@@ -71,14 +72,42 @@ func (d *Datasource) Dispose() {
 	d.spice.Close()
 }
 
-func arrowColumnToArray(columnType arrow.Type, column arrow.Array) interface{} {
+func arrowColumnToArray(field arrow.Field, columnType arrow.Type, column arrow.Array) interface{} {
 	length := column.Len()
 
 	switch columnType {
-	case arrow.STRING:
-		arr := make([]string, length)
+	case arrow.BOOL:
+		arr := make([]bool, length)
 		for i := 0; i < column.Len(); i++ {
-			arr[i] = column.(*array.String).Value(i)
+			arr[i] = column.(*array.Boolean).Value(i)
+		}
+		return arr
+
+	case arrow.UINT8:
+		arr := make([]uint8, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Uint8).Value(i)
+		}
+		return arr
+
+	case arrow.UINT16:
+		arr := make([]uint16, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Uint16).Value(i)
+		}
+		return arr
+
+	case arrow.UINT32:
+		arr := make([]uint32, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Uint32).Value(i)
+		}
+		return arr
+
+	case arrow.UINT64:
+		arr := make([]uint64, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Uint64).Value(i)
 		}
 		return arr
 
@@ -110,10 +139,39 @@ func arrowColumnToArray(columnType arrow.Type, column arrow.Array) interface{} {
 		}
 		return arr
 
+	case arrow.FLOAT32:
+		arr := make([]float32, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Float32).Value(i)
+		}
+		return arr
+
+	case arrow.FLOAT64:
+		arr := make([]float64, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Float64).Value(i)
+		}
+		return arr
+
 	case arrow.DECIMAL128:
 		arr := make([]float64, column.Len())
 		for i := 0; i < column.Len(); i++ {
 			arr[i] = column.(*array.Decimal128).Value(i).ToFloat64(1)
+		}
+		return arr
+
+	case arrow.STRING:
+		arr := make([]string, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.String).Value(i)
+		}
+		return arr
+
+	case arrow.TIMESTAMP:
+		arr := make([]time.Time, length)
+		timeUnit := field.Type.(*arrow.TimestampType).Unit
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Timestamp).Value(i).ToTime(timeUnit)
 		}
 		return arr
 	}
@@ -171,10 +229,9 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 			column := record.Column(i)
 			defer column.Release()
 
-			columnSchema := schema.Field(i)
-			columnType := columnSchema.Type.ID()
+			columnType := field.Type.ID()
 
-			arr := arrowColumnToArray(columnType, column)
+			arr := arrowColumnToArray(field, columnType, column)
 
 			frame.Fields = append(frame.Fields,
 				data.NewField(field.Name, nil, arr))

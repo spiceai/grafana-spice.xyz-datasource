@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/apache/arrow/go/v10/arrow"
 	"github.com/apache/arrow/go/v10/arrow/array"
@@ -15,6 +16,143 @@ const (
 )
 
 func TestArrowColumnToArray(t *testing.T) {
+	field := arrow.Field{}
+
+	t.Run("arrow.BOOL", func(t *testing.T) {
+		columnType := arrow.BOOL
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewBooleanBuilder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(i%2 == 0)
+		}
+
+		column := builder.NewBooleanArray()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]bool)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.UINT8", func(t *testing.T) {
+		columnType := arrow.UINT8
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewUint8Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(uint8(i))
+		}
+
+		column := builder.NewUint8Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]uint8)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1 {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.UINT16", func(t *testing.T) {
+		columnType := arrow.UINT16
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewUint16Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(uint16(i))
+		}
+
+		column := builder.NewUint16Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]uint16)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1 {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.UINT32", func(t *testing.T) {
+		columnType := arrow.UINT32
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewUint32Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(uint32(i))
+		}
+
+		column := builder.NewUint32Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]uint32)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1 {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.UINT64", func(t *testing.T) {
+		columnType := arrow.UINT64
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewUint64Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(uint64(i))
+		}
+
+		column := builder.NewUint64Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]uint64)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1 {
+			t.Fatal("wrong value")
+		}
+	})
+
 	t.Run("arrow.INT8", func(t *testing.T) {
 		columnType := arrow.INT8
 		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
@@ -29,15 +167,15 @@ func TestArrowColumnToArray(t *testing.T) {
 		column := builder.NewInt8Array()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(field, columnType, column)
 
-		int8data := data.([]int8)
+		results := data.([]int8)
 
-		if len(int8data) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if int8data[1] != 1 {
+		if results[1] != 1 {
 			t.Fatal("wrong value")
 		}
 	})
@@ -56,15 +194,15 @@ func TestArrowColumnToArray(t *testing.T) {
 		column := builder.NewInt16Array()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(field, columnType, column)
 
-		int16data := data.([]int16)
+		results := data.([]int16)
 
-		if len(int16data) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if int16data[1] != 1 {
+		if results[1] != 1 {
 			t.Fatal("wrong value")
 		}
 	})
@@ -83,15 +221,15 @@ func TestArrowColumnToArray(t *testing.T) {
 		column := builder.NewInt32Array()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(field, columnType, column)
 
-		int32data := data.([]int32)
+		results := data.([]int32)
 
-		if len(int32data) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if int32data[1] != 1 {
+		if results[1] != 1 {
 			t.Fatal("wrong value")
 		}
 	})
@@ -110,15 +248,95 @@ func TestArrowColumnToArray(t *testing.T) {
 		column := builder.NewInt64Array()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(field, columnType, column)
 
-		int64data := data.([]int64)
+		results := data.([]int64)
 
-		if len(int64data) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if int64data[1] != 1 {
+		if results[1] != 1 {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.FLOAT32", func(t *testing.T) {
+		columnType := arrow.FLOAT32
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewFloat32Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(float32(i))
+		}
+
+		column := builder.NewFloat32Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]float32)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1.0 {
+			t.Fatal("wrong value")
+		}
+	})
+
+	t.Run("arrow.FLOAT64", func(t *testing.T) {
+		columnType := arrow.FLOAT64
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewFloat64Builder(pool)
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(float64(i))
+		}
+
+		column := builder.NewFloat64Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]float64)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1.0 {
+			t.Fatal("wrong value")
+		}
+	})
+	t.Run("arrow.DECIMAL128", func(t *testing.T) {
+		columnType := arrow.DECIMAL128
+		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
+		builder := array.NewDecimal128Builder(pool, &arrow.Decimal128Type{})
+		defer builder.Release()
+
+		builder.Resize(10)
+		for i := 0; i < 10; i++ {
+			builder.Append(decimal128.New(1, uint64(i)))
+		}
+
+		column := builder.NewDecimal128Array()
+		defer column.Release()
+
+		data := arrowColumnToArray(field, columnType, column)
+
+		results := data.([]float64)
+
+		if len(results) != 10 {
+			t.Fatal("wrong array lentgh")
+		}
+
+		if results[1] != 1.8446744073709553e+18 {
 			t.Fatal("wrong value")
 		}
 	})
@@ -137,45 +355,59 @@ func TestArrowColumnToArray(t *testing.T) {
 		column := builder.NewStringArray()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(field, columnType, column)
 
-		stringdata := data.([]string)
+		results := data.([]string)
 
-		if len(stringdata) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if stringdata[1] != "value: 1" {
+		if results[1] != "value: 1" {
 			t.Fatal("wrong value")
 		}
 	})
 
-	t.Run("arrow.DECIMAL128", func(t *testing.T) {
-		columnType := arrow.DECIMAL128
+	// TODO: fix local time zone issue
+	t.Run("arrow.TIMESTAMP", func(t *testing.T) {
+		columnType := arrow.TIMESTAMP
 		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
-		builder := array.NewDecimal128Builder(pool, &arrow.Decimal128Type{})
+		builder := array.NewTimestampBuilder(pool, &arrow.TimestampType{})
 		defer builder.Release()
 
 		builder.Resize(10)
 		for i := 0; i < 10; i++ {
-			builder.Append(decimal128.New(1, uint64(i)))
+			builder.Append(arrow.Timestamp(i))
 		}
 
-		column := builder.NewDecimal128Array()
+		column := builder.NewTimestampArray()
 		defer column.Release()
 
-		data := arrowColumnToArray(columnType, column)
+		data := arrowColumnToArray(arrow.Field{
+			Type: &arrow.TimestampType{
+				Unit: 1,
+			},
+		}, columnType, column)
 
-		float64data := data.([]float64)
+		results := data.([]time.Time)
 
-		if len(float64data) != 10 {
+		if len(results) != 10 {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if float64data[1] != 1.8446744073709553e+18 {
+		if results[1] != time.Unix(0, 0) {
 			t.Fatal("wrong value")
 		}
 	})
+
+	t.Run("arrow.LIST", func(t *testing.T) {
+		t.Fatal("not implemented")
+	})
+
+	t.Run("arrow.BINARY", func(t *testing.T) {
+		t.Fatal("not implememtned")
+	})
+
 }
 
 func TestGetSpiceClient(t *testing.T) {
