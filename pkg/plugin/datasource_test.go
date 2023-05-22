@@ -375,9 +375,11 @@ func TestArrowColumnToArray(t *testing.T) {
 		builder := array.NewTimestampBuilder(pool, &arrow.TimestampType{})
 		defer builder.Release()
 
+		now := time.Now()
+
 		builder.Resize(10)
 		for i := 0; i < 10; i++ {
-			builder.Append(arrow.Timestamp(i))
+			builder.Append(arrow.Timestamp(now.UnixNano()))
 		}
 
 		column := builder.NewTimestampArray()
@@ -385,7 +387,7 @@ func TestArrowColumnToArray(t *testing.T) {
 
 		data := arrowColumnToArray(arrow.Field{
 			Type: &arrow.TimestampType{
-				Unit: 1,
+				Unit: arrow.Nanosecond,
 			},
 		}, columnType, column)
 
@@ -395,8 +397,8 @@ func TestArrowColumnToArray(t *testing.T) {
 			t.Fatal("wrong array lentgh")
 		}
 
-		if results[1] != time.Unix(0, 0) {
-			t.Fatal("wrong value")
+		if results[1].UTC() != now.UTC() {
+			t.Fatalf("wrong value, %v %v", results[1].UTC(), now.UTC())
 		}
 	})
 
