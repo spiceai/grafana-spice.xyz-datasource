@@ -12,7 +12,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
+  flightAddress?: string;
 }
 
 /**

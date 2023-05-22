@@ -26,11 +26,22 @@ var (
 	_ instancemgmt.InstanceDisposer = (*Datasource)(nil)
 )
 
+func getSpiceClient(flightAddress string) *gospice.SpiceClient {
+	if flightAddress != "" {
+		return gospice.NewSpiceClientWithAddress(flightAddress)
+	} else {
+		return gospice.NewSpiceClient()
+	}
+}
+
 // NewDatasource creates a new datasource instance.
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	spice := gospice.NewSpiceClient()
-
 	apiKey := settings.DecryptedSecureJSONData["apiKey"]
+
+	config := &spiceSettings{}
+	json.Unmarshal(settings.JSONData, &config)
+
+	spice := getSpiceClient(config.FlightAddress)
 
 	if apiKey == "" {
 		panic("missing Spice.xyz apiKey")

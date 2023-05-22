@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { InlineField, Input, SecretInput } from '@grafana/ui';
+import { InlineField, SecretInput, Input } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { MyDataSourceOptions, MySecureJsonData } from '../types';
 
@@ -7,13 +7,6 @@ interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> 
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
-  const onPathChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const jsonData = {
-      ...options.jsonData,
-      path: event.target.value,
-    };
-    onOptionsChange({ ...options, jsonData });
-  };
 
   // Secure field (only sent to the backend)
   const onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +16,14 @@ export function ConfigEditor(props: Props) {
         apiKey: event.target.value,
       },
     });
+  };
+
+  const onFlightAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const jsonData = {
+      ...options.jsonData,
+      flightAddress: event.target.value,
+    };
+    onOptionsChange({ ...options, jsonData });
   };
 
   const onResetAPIKey = () => {
@@ -39,24 +40,25 @@ export function ConfigEditor(props: Props) {
     });
   };
 
-  const { jsonData, secureJsonFields } = options;
+  const { secureJsonFields, jsonData } = options;
   const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
 
   return (
     <div className="gf-form-group">
-      <InlineField label="Path" labelWidth={12}>
+      <InlineField label="Spice Flight Address" labelWidth={20}>
         <Input
-          onChange={onPathChange}
-          value={jsonData.path || ''}
-          placeholder="json field returned to frontend"
+          value={jsonData.flightAddress || ''}
           width={40}
+          placeholder="Spice.xyz flight api address"
+          onChange={onFlightAddressChange}
         />
       </InlineField>
-      <InlineField label="API Key" labelWidth={12}>
+      <InlineField label="Spice API Key" labelWidth={20}>
         <SecretInput
+          required
           isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
           value={secureJsonData.apiKey || ''}
-          placeholder="secure json field (backend only)"
+          placeholder="Spice.xyz api key"
           width={40}
           onReset={onResetAPIKey}
           onChange={onAPIKeyChange}
