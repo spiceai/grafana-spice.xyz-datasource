@@ -60,6 +60,56 @@ func (d *Datasource) Dispose() {
 	d.spice.Close()
 }
 
+func arrowColumnToArray(columnType arrow.Type, column arrow.Array) interface{} {
+	length := column.Len()
+
+	switch columnType {
+	case arrow.STRING:
+		arr := make([]string, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.String).Value(i)
+		}
+		return arr
+
+	case arrow.INT8:
+		arr := make([]int8, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Int8).Value(i)
+		}
+		return arr
+
+	case arrow.INT16:
+		arr := make([]int16, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Int16).Value(i)
+		}
+		return arr
+
+	case arrow.INT32:
+		arr := make([]int32, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Int32).Value(i)
+		}
+		return arr
+
+	case arrow.INT64:
+		arr := make([]int64, length)
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Int64).Value(i)
+		}
+		return arr
+
+	case arrow.DECIMAL128:
+		arr := make([]float64, column.Len())
+		for i := 0; i < column.Len(); i++ {
+			arr[i] = column.(*array.Decimal128).Value(i).ToFloat64(1)
+		}
+		return arr
+	}
+
+	return nil
+}
+
 // QueryData handles multiple queries and returns multiple responses.
 // req contains the queries []DataQuery (where each query contains RefID as a unique identifier).
 // The QueryDataResponse contains a map of RefID to the response for each query, and each response
@@ -113,34 +163,10 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 			columnSchema := schema.Field(i)
 			columnType := columnSchema.Type.ID()
 
-			// TODO: rewrite this logic in more elegant way
-			// TODO: cower all possible types
-			switch columnType {
-			case arrow.STRING:
-				arr := make([]string, column.Len())
-				for i := 0; i < column.Len(); i++ {
-					arr[i] = column.(*array.String).Value(i)
-				}
-				frame.Fields = append(frame.Fields,
-					data.NewField(field.Name, nil, arr))
+			arr := arrowColumnToArray(columnType, column)
 
-			case arrow.INT64:
-				arr := make([]int64, column.Len())
-				for i := 0; i < column.Len(); i++ {
-					arr[i] = column.(*array.Int64).Value(i)
-				}
-				frame.Fields = append(frame.Fields,
-					data.NewField(field.Name, nil, arr))
-
-			// NOTE: grafana doesn't support decimal128, so we have to convert to float
-			case arrow.DECIMAL128:
-				arr := make([]float64, column.Len())
-				for i := 0; i < column.Len(); i++ {
-					arr[i] = column.(*array.Decimal128).Value(i).ToFloat64(1)
-				}
-				frame.Fields = append(frame.Fields,
-					data.NewField(field.Name, nil, arr))
-			}
+			frame.Fields = append(frame.Fields,
+				data.NewField(field.Name, nil, arr))
 		}
 	}
 
