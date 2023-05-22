@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/apache/arrow/go/v10/arrow"
 	"github.com/apache/arrow/go/v10/arrow/array"
@@ -155,14 +154,24 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 // The main use case for these health checks is the test button on the
 // datasource configuration page which allows users to verify that
 // a datasource is working as expected.
-// TODO: setup health check for SpiceAI
-func (d *Datasource) CheckHealth(_ context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
 
-	if rand.Int()%2 == 0 {
+	reader, err := d.spice.Query(ctx, "SELECT * FROM eth.recent_blocks LIMIT 1")
+	if err != nil {
 		status = backend.HealthStatusError
-		message = "randomized error"
+		message = fmt.Sprintf("error querying: %v", err.Error())
+	}
+
+	for reader.Next() {
+		record := reader.Record()
+		defer record.Release()
+
+		if record.NumRows() != 1 {
+			status = backend.HealthStatusError
+			message = "error querying"
+		}
 	}
 
 	return &backend.CheckHealthResult{
