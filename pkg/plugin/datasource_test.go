@@ -37,7 +37,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]bool)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] {
@@ -64,7 +64,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]uint8)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -91,7 +91,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]uint16)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -118,7 +118,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]uint32)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -145,7 +145,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]uint64)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -172,7 +172,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]int8)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -199,7 +199,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]int16)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -226,7 +226,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]int32)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -253,7 +253,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]int64)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1 {
@@ -280,7 +280,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]float32)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1.0 {
@@ -307,7 +307,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]float64)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1.0 {
@@ -333,7 +333,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]float64)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != 1.8446744073709553e+18 {
@@ -360,7 +360,7 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]string)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1] != "value: 1" {
@@ -368,7 +368,6 @@ func TestArrowColumnToArray(t *testing.T) {
 		}
 	})
 
-	// TODO: fix local time zone issue
 	t.Run("arrow.TIMESTAMP", func(t *testing.T) {
 		columnType := arrow.TIMESTAMP
 		pool := memory.NewCheckedAllocator(memory.NewGoAllocator())
@@ -394,22 +393,13 @@ func TestArrowColumnToArray(t *testing.T) {
 		results := data.([]time.Time)
 
 		if len(results) != 10 {
-			t.Fatal("wrong array lentgh")
+			t.Fatal("wrong array length")
 		}
 
 		if results[1].UTC() != now.UTC() {
 			t.Fatalf("wrong value, %v %v", results[1].UTC(), now.UTC())
 		}
 	})
-
-	t.Run("arrow.LIST", func(t *testing.T) {
-		t.Fatal("not implemented")
-	})
-
-	t.Run("arrow.BINARY", func(t *testing.T) {
-		t.Fatal("not implememtned")
-	})
-
 }
 
 func TestGetSpiceClient(t *testing.T) {
