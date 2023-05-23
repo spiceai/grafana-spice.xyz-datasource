@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -9,10 +11,12 @@ import (
 	"github.com/apache/arrow/go/v10/arrow/array"
 	"github.com/apache/arrow/go/v10/arrow/decimal128"
 	"github.com/apache/arrow/go/v10/arrow/memory"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/spiceai/gospice"
 )
 
 const (
-	TEST_API_KEY = "_"
+	TEST_API_KEY = "323337|b42eceab2e7c4a60a04ad57bebea830d" // spice.xyz/spicehq/gospice-tests
 )
 
 func TestArrowColumnToArray(t *testing.T) {
@@ -418,35 +422,33 @@ func TestGetSpiceClient(t *testing.T) {
 	})
 }
 
-// TODO: use mock SpiceClient or test api key
+func TestQueryData(t *testing.T) {
+	spice := gospice.NewSpiceClient()
+	defer spice.Close()
 
-// func TestQueryData(t *testing.T) {
-// 	spice := gospice.NewSpiceClient()
-// 	defer spice.Close()
+	if err := spice.Init(TEST_API_KEY); err != nil {
+		panic(fmt.Errorf("error initializing SpiceClient: %w", err))
+	}
 
-// 	if err := spice.Init(TEST_API_KEY); err != nil {
-// 		panic(fmt.Errorf("error initializing SpiceClient: %w", err))
-// 	}
+	ds := Datasource{
+		spice: *spice,
+	}
 
-// 	ds := Datasource{
-// 		spice: *spice,
-// 	}
+	resp, err := ds.QueryData(
+		context.Background(),
+		&backend.QueryDataRequest{
+			Queries: []backend.DataQuery{
+				{RefID: "A",
+					JSON: json.RawMessage(`{"QueryText": "SELECT * FROM btc.recent_blocks LIMIT 10"}`),
+				},
+			},
+		},
+	)
+	if err != nil {
+		t.Error(err)
+	}
 
-// 	resp, err := ds.QueryData(
-// 		context.Background(),
-// 		&backend.QueryDataRequest{
-// 			Queries: []backend.DataQuery{
-// 				{RefID: "A",
-// 					JSON: json.RawMessage(`{"QueryText": "SELECT * FROM btc.recent_blocks LIMIT 10"}`),
-// 				},
-// 			},
-// 		},
-// 	)
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	if len(resp.Responses) != 1 {
-// 		t.Fatal("QueryData must return a response")
-// 	}
-// }
+	if len(resp.Responses) != 1 {
+		t.Fatal("QueryData must return a response")
+	}
+}
