@@ -7,7 +7,7 @@
   "backend": true,
   "executable": "gpx_spice_xyz",
   "info": {
-    "description": "Spice.xyz datasource plugin for grafana",
+    "description": "Spice.xyz Grafana Datasource Plugin",
     "author": {
       "name": "Spice AI"
     },
