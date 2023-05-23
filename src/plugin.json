@@ -9,7 +9,7 @@
   "info": {
     "description": "Spice.xyz datasource plugin for grafana",
     "author": {
-      "name": "Spice ai"
+      "name": "Spice AI"
     },
     "keywords": ["datasource"],
     "logos": {
