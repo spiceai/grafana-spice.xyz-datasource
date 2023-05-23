@@ -174,6 +174,29 @@ func arrowColumnToArray(field arrow.Field, columnType arrow.Type, column arrow.A
 			arr[i] = column.(*array.Timestamp).Value(i).ToTime(timeUnit)
 		}
 		return arr
+
+	case arrow.LIST:
+		arr := make([]string, length)
+		for i := 0; i < column.Len(); i++ {
+			list := column.(*array.List)
+			arr[i] = ""
+
+			listType := list.DataType().ID()
+
+			for j := 0; j < list.Len(); j++ {
+				if j > 0 {
+					arr[i] += ","
+				}
+
+				switch listType {
+				case arrow.STRING:
+					arr[i] += fmt.Sprintf("%v", list.ListValues().(*array.String).Value(j))
+				case arrow.INT64:
+					arr[i] += fmt.Sprintf("%v", list.ListValues().(*array.Int64).Value(j))
+				}
+			}
+		}
+		return arr
 	}
 
 	return nil
