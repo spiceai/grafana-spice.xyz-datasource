@@ -275,7 +275,7 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
 
-	reader, err := d.spice.Query(ctx, "SELECT * FROM eth.recent_blocks LIMIT 1")
+	reader, err := d.spice.Query(ctx, "SELECT number FROM eth.recent_blocks LIMIT 1")
 	if err != nil {
 		status = backend.HealthStatusError
 		message = fmt.Sprintf("error querying: %v", err.Error())
