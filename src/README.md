@@ -2,4 +2,4 @@
 
 # Spice.xyz
 
-Spice.xyz datasource plugin for grafana
+Spice.xyz Grafana Datasource Plugin
