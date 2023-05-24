@@ -45,21 +45,26 @@ export function ConfigEditor(props: Props) {
 
   return (
     <div className="gf-form-group">
-      <InlineField label="Spice Flight Address" labelWidth={20}>
+      <InlineField
+        label="Spice Flight Address"
+        labelWidth={24}
+        required
+        tooltip="Spice.xyz Apache Arrow Flight gRPC address"
+      >
         <Input
           value={jsonData.flightAddress || 'flight.spiceai.io:443'}
           width={40}
-          placeholder="Spice.xyz flight api address"
+          placeholder="flight.spiceai.io:443"
           defaultValue="flight.spiceai.io:443"
           onChange={onFlightAddressChange}
         />
       </InlineField>
-      <InlineField label="Spice API Key" labelWidth={20}>
+      <InlineField label="Spice API Key" labelWidth={24} required>
         <SecretInput
           required
           isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
           value={secureJsonData.apiKey || ''}
-          placeholder="Spice.xyz api key"
+          placeholder="Spice API Key"
           width={40}
           onReset={onResetAPIKey}
           onChange={onAPIKeyChange}
