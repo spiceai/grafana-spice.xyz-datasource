@@ -47,9 +47,10 @@ export function ConfigEditor(props: Props) {
     <div className="gf-form-group">
       <InlineField label="Spice Flight Address" labelWidth={20}>
         <Input
-          value={jsonData.flightAddress || ''}
+          value={jsonData.flightAddress || 'flight.spiceai.io:443'}
           width={40}
           placeholder="Spice.xyz flight api address"
+          defaultValue="flight.spiceai.io:443"
           onChange={onFlightAddressChange}
         />
       </InlineField>

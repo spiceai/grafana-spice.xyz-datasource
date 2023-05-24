@@ -5,7 +5,7 @@ export interface MyQuery extends DataQuery {
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
-  queryText: 'SELECT * FROM eth.recent_blocks ORDER BY number LIMIT 10',
+  queryText: 'SELECT * FROM eth.recent_blocks LIMIT 10',
 };
 
 /**
