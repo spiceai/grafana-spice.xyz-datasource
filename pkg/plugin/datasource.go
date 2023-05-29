@@ -45,11 +45,11 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	spice := getSpiceClient(config.FlightAddress)
 
 	if apiKey == "" {
-		panic("missing Spice.xyz apiKey")
+		return nil, fmt.Errorf("missing Spice AI apiKey")
 	}
 
 	if err := spice.Init(apiKey); err != nil {
-		panic(fmt.Errorf("error initializing SpiceClient: %w", err))
+		return nil, fmt.Errorf("failed to initizlize Spice AI client: %w", err)
 	}
 
 	return &Datasource{
@@ -300,8 +300,18 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 	}
 
 	reader, err := d.spice.Query(ctx, q.QueryText)
-	if err != nil {
-		panic(fmt.Errorf("error querying: %w", err))
+
+	switch {
+	case err == nil:
+		break
+
+	default:
+		// TODO: cover custom cases
+		// response = backend.ErrDataResponse(backend.StatusTimeout, "Spice AI: timeout")
+		// response = backend.ErrDataResponse(backend.StatusBadRequest, "Spice AI:bad request")
+		// response = backend.ErrDataResponse(backend.StatusTooManyRequests, "Spice AI: too many requests")
+		return backend.ErrDataResponse(backend.StatusInternal, err.Error())
+
 	}
 
 	schema := reader.Schema()
