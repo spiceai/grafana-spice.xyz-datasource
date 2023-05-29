@@ -202,6 +202,70 @@ func arrowColumnToArray(field arrow.Field, columnType arrow.Type, column arrow.A
 	return nil
 }
 
+// Append converted column to the existing data Field
+func appendColumnToField(field *data.Field, columnType arrow.Type, column interface{}) {
+	switch columnType {
+	case arrow.UINT8:
+		for j := range column.([]uint8) {
+			field.Append(column.([]uint8)[j])
+		}
+
+	case arrow.UINT16:
+		for j := range column.([]uint16) {
+			field.Append(column.([]uint16)[j])
+		}
+
+	case arrow.UINT32:
+		for j := range column.([]uint32) {
+			field.Append(column.([]uint32)[j])
+		}
+
+	case arrow.UINT64:
+		for j := range column.([]uint64) {
+			field.Append(column.([]uint64)[j])
+		}
+	case arrow.INT8:
+		for j := range column.([]int8) {
+			field.Append(column.([]int8)[j])
+		}
+
+	case arrow.INT16:
+		for j := range column.([]int16) {
+			field.Append(column.([]int16)[j])
+		}
+
+	case arrow.INT32:
+		for j := range column.([]int32) {
+			field.Append(column.([]int32)[j])
+		}
+
+	case arrow.INT64:
+		for j := range column.([]int64) {
+			field.Append(column.([]int64)[j])
+		}
+
+	case arrow.FLOAT32:
+		for j := range column.([]float32) {
+			field.Append(column.([]float32)[j])
+		}
+
+	case arrow.DECIMAL128, arrow.FLOAT64:
+		for j := range column.([]float64) {
+			field.Append(column.([]float64)[j])
+		}
+
+	case arrow.TIMESTAMP:
+		for j := range column.([]time.Time) {
+			field.Append(column.([]time.Time)[j])
+		}
+
+	case arrow.STRING, arrow.LIST:
+		for j := range column.([]string) {
+			field.Append(column.([]string)[j])
+		}
+	}
+}
+
 // QueryData handles multiple queries and returns multiple responses.
 // req contains the queries []DataQuery (where each query contains RefID as a unique identifier).
 // The QueryDataResponse contains a map of RefID to the response for each query, and each response
@@ -244,6 +308,8 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	frame := data.NewFrame("response")
 
+	var page int64 = 0
+
 	for reader.Next() {
 		record := reader.Record()
 		defer record.Release()
@@ -256,9 +322,17 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 			arr := arrowColumnToArray(field, columnType, column)
 
-			frame.Fields = append(frame.Fields,
-				data.NewField(field.Name, nil, arr))
+			// setup fields on first record
+			if page == 0 {
+				frame.Fields = append(frame.Fields,
+					data.NewField(field.Name, nil, arr))
+			} else {
+				// append data to existing fields
+				appendColumnToField(frame.Fields[i], columnType, arr)
+			}
 		}
+
+		page++
 	}
 
 	response.Frames = append(response.Frames, frame)
