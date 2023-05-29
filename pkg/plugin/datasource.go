@@ -317,7 +317,6 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	for reader.Next() {
 		record := reader.Record()
-		defer record.Release()
 
 		for i, field := range schema.Fields() {
 			column := record.Column(i)
