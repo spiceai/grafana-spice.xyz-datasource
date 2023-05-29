@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apache/arrow/go/v10/arrow"
-	"github.com/apache/arrow/go/v10/arrow/array"
-	"github.com/apache/arrow/go/v10/arrow/decimal128"
-	"github.com/apache/arrow/go/v10/arrow/memory"
+	"github.com/apache/arrow/go/v12/arrow"
+	"github.com/apache/arrow/go/v12/arrow/array"
+	"github.com/apache/arrow/go/v12/arrow/decimal128"
+	"github.com/apache/arrow/go/v12/arrow/memory"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/spiceai/gospice"
+	"github.com/spiceai/gospice/v2"
 )
 
 const (
