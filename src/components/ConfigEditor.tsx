@@ -42,7 +42,7 @@ export function ConfigEditor(props: Props) {
           required
           isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
           value={secureJsonData.apiKey || ''}
-          placeholder="Spice API Key"
+          placeholder="API Key"
           width={40}
           onReset={onResetAPIKey}
           onChange={onAPIKeyChange}
