@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { InlineField, SecretInput, Input } from '@grafana/ui';
+import { InlineField, SecretInput } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { MyDataSourceOptions, MySecureJsonData } from '../types';
 
@@ -18,14 +18,6 @@ export function ConfigEditor(props: Props) {
     });
   };
 
-  const onFlightAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const jsonData = {
-      ...options.jsonData,
-      flightAddress: event.target.value,
-    };
-    onOptionsChange({ ...options, jsonData });
-  };
-
   const onResetAPIKey = () => {
     onOptionsChange({
       ...options,
@@ -40,25 +32,11 @@ export function ConfigEditor(props: Props) {
     });
   };
 
-  const { secureJsonFields, jsonData } = options;
+  const { secureJsonFields } = options;
   const secureJsonData = (options.secureJsonData || {}) as MySecureJsonData;
 
   return (
     <div className="gf-form-group">
-      <InlineField
-        label="Spice Flight Address"
-        labelWidth={24}
-        required
-        tooltip="Spice.xyz Apache Arrow Flight gRPC address"
-      >
-        <Input
-          value={jsonData.flightAddress || 'flight.spiceai.io:443'}
-          width={40}
-          placeholder="flight.spiceai.io:443"
-          defaultValue="flight.spiceai.io:443"
-          onChange={onFlightAddressChange}
-        />
-      </InlineField>
       <InlineField label="Spice API Key" labelWidth={24} required>
         <SecretInput
           required

@@ -406,22 +406,6 @@ func TestArrowColumnToArray(t *testing.T) {
 	})
 }
 
-func TestGetSpiceClient(t *testing.T) {
-	t.Run("Without flight address", func(t *testing.T) {
-		spice := getSpiceClient("")
-		if spice == nil {
-			t.Fatal("spice client is nil")
-		}
-	})
-
-	t.Run("With custom flight address", func(t *testing.T) {
-		spice := getSpiceClient("localhost:8080")
-		if spice == nil {
-			t.Fatal("spice client is nil")
-		}
-	})
-}
-
 func TestQueryData(t *testing.T) {
 	spice := gospice.NewSpiceClient()
 	defer spice.Close()
