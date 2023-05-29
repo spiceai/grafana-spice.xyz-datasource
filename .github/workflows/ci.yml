@@ -57,9 +57,7 @@ jobs:
         uses: magefile/mage-action@v2
         with:
           version: latest
-          # buildAll fails, apache/arrow/go/v10 fails on windows
-          # build only for current platform (linux)
-          args: buildCustom
+          args: buildAll
 
       - name: Check for E2E
         id: check-for-e2e
