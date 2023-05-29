@@ -3,6 +3,7 @@ package plugin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
 	"github.com/spiceai/gospice"
@@ -301,17 +303,21 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	reader, err := d.spice.Query(ctx, q.QueryText)
 
-	switch {
-	case err == nil:
-		break
+	if err != nil {
+		log.DefaultLogger.Error("err: %w", err)
 
-	default:
-		// TODO: cover custom cases
-		// response = backend.ErrDataResponse(backend.StatusTimeout, "Spice AI: timeout")
-		// response = backend.ErrDataResponse(backend.StatusBadRequest, "Spice AI:bad request")
-		// response = backend.ErrDataResponse(backend.StatusTooManyRequests, "Spice AI: too many requests")
-		return backend.ErrDataResponse(backend.StatusInternal, err.Error())
+		errMsg := err.Error()
 
+		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			return backend.ErrDataResponse(backend.StatusTimeout, errMsg)
+
+		case errMsg == "rpc error: code = Unknown desc = Exceeded concurrent request limit":
+			return backend.ErrDataResponse(backend.StatusTooManyRequests, errMsg)
+
+		default:
+			return backend.ErrDataResponse(backend.StatusInternal, errMsg)
+		}
 	}
 
 	schema := reader.Schema()
