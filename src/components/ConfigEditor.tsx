@@ -37,7 +37,7 @@ export function ConfigEditor(props: Props) {
 
   return (
     <div className="gf-form-group">
-      <InlineField label="Spice API Key" labelWidth={24} required>
+      <InlineField label="API Key" labelWidth={24} required>
         <SecretInput
           required
           isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
