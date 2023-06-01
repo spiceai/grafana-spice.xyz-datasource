@@ -423,7 +423,7 @@ func TestQueryData(t *testing.T) {
 		&backend.QueryDataRequest{
 			Queries: []backend.DataQuery{
 				{RefID: "A",
-					JSON: json.RawMessage(`{"QueryText": "SELECT * FROM btc.recent_blocks LIMIT 10"}`),
+					JSON: json.RawMessage(`{"QueryText": "SELECT * FROM btc.recent_blocks LIMIT 10","QuerySource": "default"}`),
 				},
 			},
 		},

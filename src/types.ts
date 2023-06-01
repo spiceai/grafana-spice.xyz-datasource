@@ -1,10 +1,14 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
+export type QuerySource = 'default' | 'firecache';
+
 export interface MyQuery extends DataQuery {
+  querySource?: QuerySource;
   queryText?: string;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
+  querySource: 'default',
   queryText: 'SELECT * FROM eth.recent_blocks LIMIT 10',
 };
 

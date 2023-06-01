@@ -1,5 +1,6 @@
 package plugin
 
 type spiceQuery struct {
-	QueryText string
+	QueryText   string
+	QuerySource string
 }

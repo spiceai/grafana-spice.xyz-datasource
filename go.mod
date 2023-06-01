@@ -6,7 +6,7 @@ require github.com/grafana/grafana-plugin-sdk-go v0.161.0
 
 require (
 	github.com/apache/arrow/go/v12 v12.0.0
-	github.com/spiceai/gospice/v2 v2.0.0-20230529083619-20f9109ab852
+	github.com/spiceai/gospice/v2 v2.1.0
 )
 
 require (

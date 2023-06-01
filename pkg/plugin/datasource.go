@@ -277,6 +277,15 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
+func (d *Datasource) SpiceQuery(ctx context.Context, query string, querySource string) (array.RecordReader, error) {
+	switch querySource {
+	case "firecache":
+		return d.spice.FireQuery(ctx, query)
+	default:
+		return d.spice.Query(ctx, query)
+	}
+}
+
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	var response backend.DataResponse
 
@@ -290,7 +299,7 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	reader, err := d.spice.Query(ctx, q.QueryText)
+	reader, err := d.SpiceQuery(ctx, q.QueryText, q.QuerySource)
 
 	if err != nil {
 		log.DefaultLogger.Error("err: %w", err)
