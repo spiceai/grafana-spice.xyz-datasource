@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/apache/arrow/go/v12/arrow"
 	"github.com/apache/arrow/go/v12/arrow/array"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -43,8 +45,23 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, fmt.Errorf("failed to initizlize Spice AI client: %w", err)
 	}
 
+	opts, err := settings.HTTPClientOptions()
+	if err != nil {
+		return nil, fmt.Errorf("http client options: %w", err)
+	}
+	opts.Headers = map[string]string{
+		"Content-Type": "application/json",
+		"X-API-Key":    apiKey,
+	}
+
+	client, err := httpclient.New(opts)
+	if err != nil {
+		return nil, fmt.Errorf("httpclient new: %w", err)
+	}
+
 	return &Datasource{
 		spice:    *spice,
+		client:   *client,
 		settings: settings,
 	}, nil
 }
@@ -54,6 +71,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 type Datasource struct {
 	spice    gospice.SpiceClient
 	settings backend.DataSourceInstanceSettings
+	client   http.Client
 }
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
@@ -352,6 +370,41 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	reader.Release()
 	return response
+}
+
+func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
+	switch req.Path {
+	case "datasets":
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://data.spiceai.io/v0.1/datasets", nil)
+		if err != nil {
+			return err
+		}
+
+		res, err := d.client.Do(req)
+		if err != nil {
+			return err
+		}
+
+		defer res.Body.Close()
+
+		var jsonData []map[string]interface{}
+		json.NewDecoder(res.Body).Decode(&jsonData)
+
+		data, err := json.Marshal(jsonData)
+		if err != nil {
+			return err
+		}
+
+		return sender.Send(&backend.CallResourceResponse{
+			Status: http.StatusOK,
+			Body:   data,
+		})
+
+	default:
+		return sender.Send(&backend.CallResourceResponse{
+			Status: http.StatusNotFound,
+		})
+	}
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.
