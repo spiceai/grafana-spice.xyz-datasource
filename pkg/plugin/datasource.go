@@ -42,7 +42,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 
 	if err := spice.Init(apiKey); err != nil {
-		return nil, fmt.Errorf("failed to initizlize Spice AI client: %w", err)
+		return nil, fmt.Errorf("failed to initialize gospice: %w", err)
 	}
 
 	opts, err := settings.HTTPClientOptions()
