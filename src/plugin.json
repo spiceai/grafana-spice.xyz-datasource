@@ -9,15 +9,25 @@
   "info": {
     "description": "Spice.xyz Grafana Datasource Plugin",
     "author": {
-      "name": "Spice AI"
+      "name": "Spice AI",
+      "url": "https://spice.xyz"
     },
     "keywords": ["datasource"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
     },
-    "links": [],
-    "screenshots": [],
+    "links": [{
+      "name": "Website",
+      "url": "https://spice.xyz"
+    }, {
+      "name": "License",
+      "url": "https://github.com/spiceai/grafana-spice.xyz-datasource/blob/trunk/LICENSE"
+    }],
+    "screenshots": [{
+      "name": "spice.xyz datasource",
+      "path": "img/spice-dashboard-screenshot.png"
+    }],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },

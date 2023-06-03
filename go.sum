@@ -326,8 +326,8 @@ github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304/go.mod h1
 github.com/smartystreets/goconvey v0.0.0-20181108003508-044398e4856c h1:Ho+uVpkel/udgjbwB5Lktg9BtvJSh2DT0Hi6LPSyI2w=
 github.com/smartystreets/goconvey v0.0.0-20181108003508-044398e4856c/go.mod h1:XDJAKZRPZ1CvBcN2aX5YOUTYGHki24fSF0Iv48Ibg0s=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
-github.com/spiceai/gospice/v2 v2.0.0-20230529083619-20f9109ab852 h1:ky6xDd2GI6X6S8kxLwZhM4RoxAirwF0Q9H7+qrvG8iQ=
-github.com/spiceai/gospice/v2 v2.0.0-20230529083619-20f9109ab852/go.mod h1:BjhEruXY+P+9HQUPRbPAnzj4tZmrGLbSvlLcy+d0DkQ=
+github.com/spiceai/gospice/v2 v2.1.0 h1:BiB+8OkG9BQL3iYC093SuYVNgZ6VCK3JWSU79cQc1ek=
+github.com/spiceai/gospice/v2 v2.1.0/go.mod h1:BjhEruXY+P+9HQUPRbPAnzj4tZmrGLbSvlLcy+d0DkQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

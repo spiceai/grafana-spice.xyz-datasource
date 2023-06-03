@@ -1,16 +1,21 @@
 package plugin
 
 import (
+	"compress/gzip"
+	"compress/zlib"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/apache/arrow/go/v12/arrow"
 	"github.com/apache/arrow/go/v12/arrow/array"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -40,11 +45,27 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 
 	if err := spice.Init(apiKey); err != nil {
-		return nil, fmt.Errorf("failed to initizlize Spice AI client: %w", err)
+		return nil, fmt.Errorf("failed to initialize gospice: %w", err)
+	}
+
+	opts, err := settings.HTTPClientOptions()
+	if err != nil {
+		return nil, fmt.Errorf("http client options: %w", err)
+	}
+	opts.Headers = map[string]string{
+		"Content-Type":    "application/json",
+		"Accept-Encoding": "gzip, deflate",
+		"X-API-Key":       apiKey,
+	}
+
+	client, err := httpclient.New(opts)
+	if err != nil {
+		return nil, fmt.Errorf("httpclient new: %w", err)
 	}
 
 	return &Datasource{
 		spice:    *spice,
+		client:   *client,
 		settings: settings,
 	}, nil
 }
@@ -54,6 +75,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 type Datasource struct {
 	spice    gospice.SpiceClient
 	settings backend.DataSourceInstanceSettings
+	client   http.Client
 }
 
 // Dispose here tells plugin SDK that plugin wants to clean up resources when a new instance
@@ -277,6 +299,15 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
+func (d *Datasource) SpiceQuery(ctx context.Context, query string, querySource string) (array.RecordReader, error) {
+	switch querySource {
+	case "firecache":
+		return d.spice.FireQuery(ctx, query)
+	default:
+		return d.spice.Query(ctx, query)
+	}
+}
+
 func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, query backend.DataQuery) backend.DataResponse {
 	var response backend.DataResponse
 
@@ -290,7 +321,7 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 		return backend.ErrDataResponse(backend.StatusBadRequest, fmt.Sprintf("json unmarshal: %v", err.Error()))
 	}
 
-	reader, err := d.spice.Query(ctx, q.QueryText)
+	reader, err := d.SpiceQuery(ctx, q.QueryText, q.QuerySource)
 
 	if err != nil {
 		log.DefaultLogger.Error("err: %w", err)
@@ -343,6 +374,65 @@ func (d *Datasource) query(ctx context.Context, pCtx backend.PluginContext, quer
 
 	reader.Release()
 	return response
+}
+
+func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
+	switch req.Path {
+	case "datasets":
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://data.spiceai.io/v0.1/datasets", nil)
+		if err != nil {
+			return err
+		}
+
+		res, err := d.client.Do(req)
+		if err != nil {
+			return err
+		}
+
+		defer res.Body.Close()
+
+		var jsonData []map[string]interface{}
+
+		var reader io.ReadCloser
+		switch res.Header.Get("Content-Encoding") {
+		case "gzip":
+			reader, err = gzip.NewReader(res.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+
+		case "deflate":
+			reader, err = zlib.NewReader(res.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+
+		default:
+			reader = res.Body
+		}
+
+		json.NewDecoder(reader).Decode(&jsonData)
+
+		log.DefaultLogger.Info(fmt.Sprintf("datasets raw: %v", res.Body))
+		log.DefaultLogger.Info(fmt.Sprintf("datasets: %v", jsonData))
+
+		data, err := json.Marshal(jsonData)
+		if err != nil {
+			return err
+		}
+
+		return sender.Send(&backend.CallResourceResponse{
+			Status: http.StatusOK,
+			Body:   data,
+		})
+
+	default:
+		return sender.Send(&backend.CallResourceResponse{
+			Status: http.StatusNotFound,
+		})
+	}
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.
