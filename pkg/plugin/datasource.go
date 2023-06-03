@@ -1,10 +1,13 @@
 package plugin
 
 import (
+	"compress/gzip"
+	"compress/zlib"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -50,8 +53,9 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, fmt.Errorf("http client options: %w", err)
 	}
 	opts.Headers = map[string]string{
-		"Content-Type": "application/json",
-		"X-API-Key":    apiKey,
+		"Content-Type":    "application/json",
+		"Accept-Encoding": "gzip, deflate",
+		"X-API-Key":       apiKey,
 	}
 
 	client, err := httpclient.New(opts)
@@ -388,7 +392,31 @@ func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResource
 		defer res.Body.Close()
 
 		var jsonData []map[string]interface{}
-		json.NewDecoder(res.Body).Decode(&jsonData)
+
+		var reader io.ReadCloser
+		switch res.Header.Get("Content-Encoding") {
+		case "gzip":
+			reader, err = gzip.NewReader(res.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+
+		case "deflate":
+			reader, err = zlib.NewReader(res.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+
+		default:
+			reader = res.Body
+		}
+
+		json.NewDecoder(reader).Decode(&jsonData)
+
+		log.DefaultLogger.Info(fmt.Sprintf("datasets raw: %v", res.Body))
+		log.DefaultLogger.Info(fmt.Sprintf("datasets: %v", jsonData))
 
 		data, err := json.Marshal(jsonData)
 		if err != nil {
