@@ -1,5 +1,3 @@
-<img src="../img/spice-dashboard-screenshot.png" />
-
 # Spice.xyz
 
 Spice is a high-performance web3 data provider and platform for applications, machine learning (ML), and data science.
