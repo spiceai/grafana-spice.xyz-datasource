@@ -32,6 +32,7 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    ```bash
    mage -l
    ```
+
 ### Frontend
 
 1. Install dependencies
@@ -88,7 +89,6 @@ Grafana supports a wide range of data sources, including Prometheus, MySQL, and 
    npm run lint:fix
    ```
 
-
 # Distributing your plugin
 
 When distributing a Grafana plugin either within the community or privately the plugin must be signed so the Grafana application can verify its authenticity. This can be done with the `@grafana/sign-plugin` package.
@@ -127,7 +127,6 @@ To trigger the workflow we need to push a version tag to github. This can be ach
 
 1. Run `npm version <major|minor|patch>`
 2. Run `git push origin main --follow-tags`
-
 
 ## Learn more
 

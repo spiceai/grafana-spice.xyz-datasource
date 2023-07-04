@@ -415,9 +415,6 @@ func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResource
 
 		json.NewDecoder(reader).Decode(&jsonData)
 
-		log.DefaultLogger.Info(fmt.Sprintf("datasets raw: %v", res.Body))
-		log.DefaultLogger.Info(fmt.Sprintf("datasets: %v", jsonData))
-
 		data, err := json.Marshal(jsonData)
 		if err != nil {
 			return err
