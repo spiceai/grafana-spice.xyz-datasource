@@ -6,6 +6,7 @@
   "metrics": true,
   "backend": true,
   "executable": "gpx_spice_xyz",
+  "alerting": true,
   "info": {
     "description": "Spice.xyz Grafana Datasource Plugin",
     "author": {
