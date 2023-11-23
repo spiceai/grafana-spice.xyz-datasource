@@ -7,7 +7,7 @@ import { MyDataSourceOptions, MyQuery, QuerySource } from '../types';
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
 const sourceOptions: Array<SelectableValue<QuerySource>> = [
-  { label: 'Spice.xyz', value: 'default' },
+  { label: 'Spice.ai', value: 'default' },
   { label: 'Firecache', value: 'firecache', icon: 'fire' },
 ];
 

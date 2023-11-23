@@ -1,7 +1,7 @@
 {
-  "name": "spice-xyz",
-  "version": "0.0.2",
-  "description": "Spice.xyz datasource plugin for grafana",
+  "name": "spice-ai",
+  "version": "0.0.3",
+  "description": "Spice.ai datasource plugin for grafana",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
@@ -57,12 +57,12 @@
   },
   "dependencies": {
     "@emotion/css": "^11.1.3",
-    "@grafana/data": "9.3.8",
-    "@grafana/runtime": "9.3.8",
-    "@grafana/ui": "9.3.8",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "tslib": "2.5.0"
+    "@grafana/data": "10.2.2",
+    "@grafana/runtime": "10.2.2",
+    "@grafana/ui": "10.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "tslib": "2.6.2"
   },
   "packageManager": "npm@9.3.1"
 }

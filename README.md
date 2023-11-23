@@ -1,6 +1,6 @@
 # grafana-datasource
 
-Spice.xyz Grafana Datasource
+Spice.ai Grafana Datasource
 
 # Grafana data source plugin template
 

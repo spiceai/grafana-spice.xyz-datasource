@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/apache/arrow/go/v12/arrow"
-	"github.com/apache/arrow/go/v12/arrow/array"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/apache/arrow/go/v13/arrow/array"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
@@ -20,7 +20,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
-	"github.com/spiceai/gospice/v2"
+	"github.com/spiceai/gospice/v3"
 )
 
 // Make sure Datasource implements required interfaces. This is important to do
@@ -35,7 +35,7 @@ var (
 )
 
 // NewDatasource creates a new datasource instance.
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	apiKey := settings.DecryptedSecureJSONData["apiKey"]
 
 	spice := gospice.NewSpiceClient()
@@ -48,7 +48,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, fmt.Errorf("failed to initialize gospice: %w", err)
 	}
 
-	opts, err := settings.HTTPClientOptions()
+	opts, err := settings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("http client options: %w", err)
 	}
