@@ -1,6 +1,6 @@
 # Security Policy
 
-This document outlines the security policy and procedures for the Spice.xyz Grafana Plugin. Please use this as a guideline for reporting security vulnerabilities that you might discover in our code.
+This document outlines the security policy and procedures for the Spice.ai Grafana Plugin. Please use this as a guideline for reporting security vulnerabilities that you might discover in our code.
 
 ### Supported Versions
 
@@ -11,7 +11,7 @@ We are committed to patching all security vulnerabilities in the latest major ve
 | 0.0.1   | :white_check_mark: |
 | <0.0.1  | :x:                |
 
-*Note: Older versions will no longer receive security updates. We encourage you to update to the latest version.*
+_Note: Older versions will no longer receive security updates. We encourage you to update to the latest version._
 
 ### Reporting a Vulnerability
 
@@ -19,8 +19,8 @@ Should you identify a vulnerability in the plugin, we would greatly appreciate y
 
 Here's how you can report an issue:
 
-1. Please contact us by sending an email to [security@spice.ai](mailto:security@spice.ai). 
-2. Describe the vulnerability in as much detail as possible. Information such as the conditions on which reproducing the bug is contingent, its potential impact, and your possible solutions are all very helpful. 
+1. Please contact us by sending an email to [security@spice.ai](mailto:security@spice.ai).
+2. Describe the vulnerability in as much detail as possible. Information such as the conditions on which reproducing the bug is contingent, its potential impact, and your possible solutions are all very helpful.
 3. Do not publicize the vulnerability until we've had a chance to investigate and respond to it.
 
 **Please do not open a GitHub issue if the bug is a security vulnerability.**

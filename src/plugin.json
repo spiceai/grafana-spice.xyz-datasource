@@ -1,17 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
-  "name": "Spice.xyz",
+  "name": "Spice.ai",
   "id": "spiceai-spicexyz-datasource",
   "metrics": true,
   "backend": true,
   "executable": "gpx_spice_xyz",
   "alerting": true,
   "info": {
-    "description": "Spice.xyz Grafana Datasource Plugin",
+    "description": "Spice.ai Grafana Datasource Plugin",
     "author": {
       "name": "Spice AI",
-      "url": "https://spice.xyz"
+      "url": "https://spice.ai"
     },
     "keywords": ["datasource"],
     "logos": {
@@ -20,13 +20,13 @@
     },
     "links": [{
       "name": "Website",
-      "url": "https://spice.xyz"
+      "url": "https://spice.ai"
     }, {
       "name": "License",
       "url": "https://github.com/spiceai/grafana-spice.xyz-datasource/blob/trunk/LICENSE"
     }],
     "screenshots": [{
-      "name": "spice.xyz datasource",
+      "name": "spice.ai datasource",
       "path": "img/spice-dashboard-screenshot.png"
     }],
     "version": "%VERSION%",
