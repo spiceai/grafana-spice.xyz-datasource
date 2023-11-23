@@ -35,7 +35,7 @@ var (
 )
 
 // NewDatasource creates a new datasource instance.
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	apiKey := settings.DecryptedSecureJSONData["apiKey"]
 
 	spice := gospice.NewSpiceClient()
@@ -48,7 +48,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, fmt.Errorf("failed to initialize gospice: %w", err)
 	}
 
-	opts, err := settings.HTTPClientOptions()
+	opts, err := settings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("http client options: %w", err)
 	}
